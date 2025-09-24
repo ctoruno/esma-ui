@@ -3,7 +3,6 @@
 This repository contains a **Streamlit-based chat interface** that connects to a **FastAPI server** running a LangChain/KLangGraph agent.  
 The app allows users to interact with the agent in natural language, request data analyses, and generate SQL queries for ENAHO (Peru) and GEIH (Colombia) datasets.
 
----
 
 ## 🚀 Features
 - Chat-style interface powered by **Streamlit**.
@@ -21,8 +20,6 @@ The app allows users to interact with the agent in natural language, request dat
   pip install -r requirements.txt
 ````
 
----
-
 ## ▶️ Running the App
 
 1. Start your FastAPI server that serves the LangChain/KLangGraph agent (make sure it exposes a `/chat/stream` endpoint).
@@ -34,8 +31,6 @@ The app allows users to interact with the agent in natural language, request dat
    ```
 
 3. Open your browser at [http://localhost:8501](http://localhost:8501).
-
----
 
 ## ⚙️ Configuration
 
@@ -51,8 +46,6 @@ The app allows users to interact with the agent in natural language, request dat
   ```python
   CONNECTION_TIMEOUT = 300.0
   ```
-
----
 
 ## 📂 Project Structure
 
@@ -71,19 +64,13 @@ esma-ui
 └── uv.lock
 ```
 
----
-
 ## 💡 Notes
 
 * The agent may produce incorrect responses; provide clear and precise prompts for better results.
 * Debug mode can be enabled in `main.py` to inspect raw API responses.
-
----
 
 ## 🖥️ Example Use
 
 * Ask natural language questions about **ENAHO** or **GEIH** data.
 * Generate **statistics**, **summaries**, or **SQL queries**.
 * Stream real-time answers from the LangChain/KLangGraph agent.
-
----
