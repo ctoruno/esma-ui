@@ -4,17 +4,17 @@ steps:
   args:
     - 'build'
     - '-t'
-    - 'us-east1-docker.pkg.dev/$PROJECT_ID/esma-agent/esma-agent:$SHORT_SHA'
+    - 'us-east1-docker.pkg.dev/$PROJECT_ID/esma-streamlit/esma-streamlit:$SHORT_SHA'
     - '.'
 
 # Step 2: Push the image to Google Artifact Registry
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - 'push'
-    - 'us-east1-docker.pkg.dev/$PROJECT_ID/esma-agent/esma-agent:$SHORT_SHA'
+    - 'us-east1-docker.pkg.dev/$PROJECT_ID/esma-streamlit/esma-streamlit:$SHORT_SHA'
 
 images:
-- 'us-east1-docker.pkg.dev/$PROJECT_ID/esma-agent/esma-agent:$SHORT_SHA'
+- 'us-east1-docker.pkg.dev/$PROJECT_ID/esma-streamlit/esma-streamlit:$SHORT_SHA'
 
 options:
   defaultLogsBucketBehavior: 'REGIONAL_USER_OWNED_BUCKET'
