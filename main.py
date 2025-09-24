@@ -1,4 +1,4 @@
-import ast
+import os
 import asyncio
 import json
 import uuid
@@ -27,55 +27,31 @@ if "debug_mode" not in st.session_state:
 BASE_URL = "https://esma-agent-514700908055.us-east1.run.app"
 CONNECTION_TIMEOUT = 300.0
 
-with st.sidebar:
 
-    st.title("Esmé 🤖")
-    st.markdown(
-        "<h5><i>Tu asistente virtual para la ENAHO y la GEIH</i></h5>", 
-        unsafe_allow_html=True
-    )
-    st.caption("Powered by ESMA SQL Agent")
-    
-    st.divider()
-    st.markdown(
-        """
-        <h5>📋 Instrucciones</h5>
-        <p style="font-size: 14px;">Pregunta sobre las bases de datos ENAHO (Perú) o GEIH (Colombia)</p>
-        <p style="font-size: 14px;">Puedes solicitar análisis, estadísticas y consultas SQL</p>
-        <p style="font-size: 14px;">Esmé puede cometer errores. Intenta ser preciso y claro en tus preguntas.</p>
-        """,
-        unsafe_allow_html=True
-    )
-    
-    if st.button("🔄 Nueva Conversación", use_container_width=True):
-        st.session_state.messages = []
-        st.session_state.thread_id = f"esma-chat-{str(uuid.uuid4())}"
-        st.rerun()
-    
-    st.divider()
-    con1, con2 = st.columns(2)
-    with con1:
-        st.markdown("<h5>Estado de Conexión:</h5>", unsafe_allow_html=True)
-    with con2:
-        if st.session_state.is_processing:
-            st.info("🔄 Procesando...")
+def check_password():
+    """Returns `True` if the user had the correct password."""
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if st.session_state["password"] == os.getenv("password"):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
         else:
-            st.success("✅ Listo")
+            st.session_state["password_correct"] = False
 
-    id1, id2 = st.columns(2)
-    with id1:
-        st.markdown("<h5>ID de conversación:</h5>", unsafe_allow_html=True)
-    with id2:
-        st.code(st.session_state.thread_id[-8:], language=None)
-
-    # st.divider()
-    # st.session_state.debug_mode = st.checkbox("🐛 Modo Debug", value=st.session_state.debug_mode)
-
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
+    if "password_correct" not in st.session_state:
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        return False
+    elif not st.session_state["password_correct"]:
+        st.text_input(
+            "Password", type="password", on_change=password_entered, key="password"
+        )
+        st.error("😕 Password incorrect")
+        return False
+    else:
+        return True
 
 def parse_sse_content(content_str: str, debug: bool = False) -> Optional[str]:
     """
@@ -283,36 +259,87 @@ async def get_api_response_streaming(message: str, thread_id: str, placeholder, 
     return full_response
 
 
-if question := st.chat_input(
-    "Pregúntame sobre la ENAHO o la GEIH...", 
-    disabled=st.session_state.is_processing
-):
-    with st.chat_message("user"):
-        st.markdown(question)
-    
-    st.session_state.messages.append(
-        {"role": "user", "content": question}
-    )
-    
-    with st.chat_message("assistant"):
-        response_placeholder = st.empty()        
-        st.session_state.is_processing = True
+if check_password():
+
+    with st.sidebar:
+
+        st.title("Esmé 🤖")
+        st.markdown(
+            "<h5><i>Tu asistente virtual para la ENAHO y la GEIH</i></h5>", 
+            unsafe_allow_html=True
+        )
+        st.caption("Powered by ESMA SQL Agent")
         
-        response = asyncio.run(
-            get_api_response_streaming(
-                question, 
-                st.session_state.thread_id,
-                response_placeholder,
-                st.session_state.debug_mode
-            )
+        st.divider()
+        st.markdown(
+            """
+            <h5>📋 Instrucciones</h5>
+            <p style="font-size: 14px;">Pregunta sobre las bases de datos ENAHO (Perú) o GEIH (Colombia)</p>
+            <p style="font-size: 14px;">Puedes solicitar análisis, estadísticas y consultas SQL</p>
+            <p style="font-size: 14px;">Esmé puede cometer errores. Intenta ser preciso y claro en tus preguntas.</p>
+            """,
+            unsafe_allow_html=True
         )
         
-        st.session_state.is_processing = False
-    
-    st.session_state.messages.append(
-        {"role": "assistant", "content": response}
-    )
-    
-    if not st.session_state.debug_mode:
-        st.rerun()
+        if st.button("🔄 Nueva Conversación", use_container_width=True):
+            st.session_state.messages = []
+            st.session_state.thread_id = f"esma-chat-{str(uuid.uuid4())}"
+            st.rerun()
+        
+        st.divider()
+        con1, con2 = st.columns(2)
+        with con1:
+            st.markdown("<h5>Estado de Conexión:</h5>", unsafe_allow_html=True)
+        with con2:
+            if st.session_state.is_processing:
+                st.info("🔄 Procesando...")
+            else:
+                st.success("✅ Listo")
+
+        id1, id2 = st.columns(2)
+        with id1:
+            st.markdown("<h5>ID de conversación:</h5>", unsafe_allow_html=True)
+        with id2:
+            st.code(st.session_state.thread_id[-8:], language=None)
+
+        # st.divider()
+        # st.session_state.debug_mode = st.checkbox("🐛 Modo Debug", value=st.session_state.debug_mode)
+
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+    if question := st.chat_input(
+        "Pregúntame sobre la ENAHO o la GEIH...", 
+        disabled=st.session_state.is_processing
+    ):
+        with st.chat_message("user"):
+            st.markdown(question)
+        
+        st.session_state.messages.append(
+            {"role": "user", "content": question}
+        )
+        
+        with st.chat_message("assistant"):
+            response_placeholder = st.empty()        
+            st.session_state.is_processing = True
+            
+            response = asyncio.run(
+                get_api_response_streaming(
+                    question, 
+                    st.session_state.thread_id,
+                    response_placeholder,
+                    st.session_state.debug_mode
+                )
+            )
+            
+            st.session_state.is_processing = False
+        
+        st.session_state.messages.append(
+            {"role": "assistant", "content": response}
+        )
+        
+        if not st.session_state.debug_mode:
+            st.rerun()
 
