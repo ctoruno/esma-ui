@@ -1,4 +1,5 @@
 import os
+import re
 import asyncio
 import json
 import uuid
@@ -61,46 +62,6 @@ def parse_sse_content(content_str: str, debug: bool = False) -> Optional[str]:
         st.sidebar.code(f"Raw SSE: {content_str[:100]}", language=None)
     
     try:
-        # The API sends malformed JSON with mixed quotes: {"type": "content", "content": 'actual content'}
-        # We need to fix this to be valid JSON
-        
-        # Method 1: Try to fix mixed quotes
-        if '"content": \'' in content_str or '"content":\'' in content_str:
-            # Handle both with and without space after colon
-            if '"content": \'' in content_str:
-                start_marker = '"content": \''
-            else:
-                start_marker = '"content":\''
-            
-            start_idx = content_str.index(start_marker) + len(start_marker)
-            
-            # The content might be incomplete (truncated) or complete
-            # Look for the ending pattern '} or just take everything if incomplete
-            if content_str.endswith('\'}'):
-                end_idx = len(content_str) - 2  # Before '}
-            elif '\'}\n' in content_str:
-                end_idx = content_str.index('\'}\n')
-            elif '\'}' in content_str:
-                end_idx = content_str.index('\'}')
-            else:
-                # Content is truncated, take everything after the marker
-                end_idx = len(content_str)
-            
-            # Extract the actual content
-            actual_content = content_str[start_idx:end_idx]
-            
-            # Unescape characters from repr()
-            actual_content = actual_content.replace("\\n", "\n")
-            actual_content = actual_content.replace("\\t", "\t")
-            actual_content = actual_content.replace("\\'", "'")
-            actual_content = actual_content.replace("\\\\", "\\")
-            
-            if debug:
-                st.sidebar.success(f"Extracted: {actual_content[:50]}...")
-            
-            return actual_content if actual_content else None
-        
-        # Method 2: Try standard JSON parsing (in case the API is fixed)
         try:
             content_data = json.loads(content_str)
             chunk = content_data.get("content", "")
@@ -112,14 +73,10 @@ def parse_sse_content(content_str: str, debug: bool = False) -> Optional[str]:
         except json.JSONDecodeError:
             pass
         
-        # Method 3: Try to extract any text between quotes
-        import re
-        # Look for content between any quotes after "content":
         pattern = r'"content":\s*["\']([^"\']*)["\']'
         match = re.search(pattern, content_str)
         if match:
             content = match.group(1)
-            # Unescape
             content = content.replace("\\n", "\n")
             content = content.replace("\\t", "\t")
             content = content.replace("\\'", "'")
