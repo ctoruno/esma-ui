@@ -234,7 +234,7 @@ if check_password():
             <h5>📋 Instrucciones</h5>
             <p style="font-size: 14px;">Pregunta a Esme sobre sus funcionalidades y capacidades</p>
             <p style="font-size: 14px;">Puedes solicitar análisis, estadísticas y consultas SQL relacionadas a la ENAHO, GEIH, EPHC, y ENEMDU</p>
-            <p style="font-size: 14px;">Esmé puede cometer errores. Intenta ser preciso y claro en tus preguntas.</p>
+            <p style="font-size: 14px;">Esmé puede cometer errores. Para evitar contaminar los resultados con información de consultas previas, comienza una nueva conversación.</p>
             """,
             unsafe_allow_html=True
         )
@@ -269,7 +269,7 @@ if check_password():
             st.markdown(message["content"])
 
     if question := st.chat_input(
-        "Pregúntame sobre la ENAHO o la GEIH...", 
+        "Escribe tu consulta aquí... recuerda ser claro y preciso en tus preguntas.", 
         disabled=st.session_state.is_processing
     ):
         with st.chat_message("user"):
