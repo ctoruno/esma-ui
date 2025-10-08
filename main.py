@@ -222,17 +222,18 @@ if check_password():
 
         st.title("Esmé 🤖")
         st.markdown(
-            "<h5><i>Tu asistente virtual para la ENAHO y la GEIH</i></h5>", 
+            "<h5><i>Tu asistente virtual para tus consultas de datos</i></h5><br>", 
             unsafe_allow_html=True
         )
-        st.caption("Powered by ESMA SQL Agent")
+        # st.caption("Un proyecto de Equilibrium")
+        st.image("equilibrium-logo.png", use_container_width=True)
         
         st.divider()
         st.markdown(
             """
             <h5>📋 Instrucciones</h5>
-            <p style="font-size: 14px;">Pregunta sobre las bases de datos ENAHO (Perú) o GEIH (Colombia)</p>
-            <p style="font-size: 14px;">Puedes solicitar análisis, estadísticas y consultas SQL</p>
+            <p style="font-size: 14px;">Pregunta a Esme sobre sus funcionalidades y capacidades</p>
+            <p style="font-size: 14px;">Puedes solicitar análisis, estadísticas y consultas SQL relacionadas a la ENAHO, GEIH, EPHC, y ENEMDU</p>
             <p style="font-size: 14px;">Esmé puede cometer errores. Intenta ser preciso y claro en tus preguntas.</p>
             """,
             unsafe_allow_html=True
